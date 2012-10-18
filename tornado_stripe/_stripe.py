@@ -51,7 +51,7 @@ class Stripe(object):
         '''
         Builds API URL.
         Example:
-            tornado_api.Stripe('api_key').plans.get(callback=lambda x: x)
+            tornado_stripe.Stripe('api_key').plans.get(callback=lambda x: x)
         '''
         if name in self.__class__.resources:
             self.url = '/'.join([self.url or self.api_endpoint, name])
@@ -74,7 +74,7 @@ class Stripe(object):
         Append ID to constructed URL.
         Example:
             customer_id = 'cus_xyz'
-            tornado_api.Stripe('api_key').customers.id(customer_id).subscription.post(callback=lambda x: x)
+            tornado_stripe.Stripe('api_key').customers.id(customer_id).subscription.post(callback=lambda x: x)
         '''
         self.url = '/'.join([self.url or self.api_endpoint, str(id)])
         return self
