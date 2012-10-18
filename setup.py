@@ -1,22 +1,5 @@
 import os, re
-from setuptools import setup
-
-
-def parse_requirements(file_name):
-    requirements = []
-    for line in open(file_name, 'r').read().split('\n'):
-        if re.match(r'(\s*#)|(\s*$)', line):
-            continue
-        if re.match(r'\s*-e\s+', line):
-            # TODO support version numbers
-            requirements.append(re.sub(r'\s*-e\s+.*#egg=(.*)$', r'\1', line))
-        elif re.match(r'\s*-f\s+', line):
-            pass
-        else:
-            requirements.append(line)
-
-    return requirements
-
+from setuptools import setup, find_packages
 
 setup(
     name = "tornado-stripe",
@@ -27,9 +10,13 @@ setup(
     license = "Apache Software License",
     keywords = "tornado stripe api",
     url = "https://github.com/didip/tornado-stripe",
-    install_requires = parse_requirements('requirements.txt'),
-    packages=['tornado_stripe'],
-    long_description=open('README.md').read(),
+    packages=find_packages(exclude=['tests']),
+    package_data = {
+        # If any package contains *.txt or *.md files, include them
+        '': ['*.txt', '*.md'],
+    },
+    include_package_data=True,
+    install_requires = ["tornado>=2.4"],
     classifiers=[
         "License :: OSI Approved :: Apache Software License",
         "Programming Language :: Python :: 2.6",
