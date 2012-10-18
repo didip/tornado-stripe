@@ -105,7 +105,7 @@ stripe.plans.id(DUMMY_PLAN['id']).delete()
 Running Tests
 -------------
 
-You must set STRIPE_API_KEY environment variable. Example:
+You must set `STRIPE_API_KEY` environment variable. Example:
 
     export STRIPE_API_KEY=your-stripe-api-key; nosetests
 
