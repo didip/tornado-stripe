@@ -42,7 +42,7 @@ DUMMY_PLAN = {
     'name': 'Amazing Gold Plan',
     'currency': 'usd',
     'id': 'stripe-test-gold'
- }
+}
 
 # Creating Stripe plan
 stripe.plans.post(**DUMMY_PLAN)
