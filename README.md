@@ -48,14 +48,14 @@ DUMMY_PLAN = {
 stripe.plans.post(**DUMMY_PLAN)
 
 # Fetching Stripe plan
-plan = self.stripe.plans.id(DUMMY_PLAN['id']).get()
+plan = stripe.plans.id(DUMMY_PLAN['id']).get()
 ```
 
 
 URL Builder
 -----------
 
-tornado_stripe.Stripe maps to Stripe Curl URL exactly one-to-one.
+`tornado_stripe.Stripe` maps to Stripe Curl URL exactly one-to-one.
 
 ```python
 from tornado_stripe import Stripe
@@ -77,28 +77,28 @@ stripe.events.id(EVENT_ID)                      # == /v1/events/{EVENT_ID}
 ```
 
 
-Performing HTTP request
------------------------
+Performing HTTP requests
+------------------------
 
 ```python
-    stripe = tornado_stripe.Stripe(YOUR_STRIPE_API_KEY)
+stripe = tornado_stripe.Stripe('api_key')
 
-    # GET
-    stripe.plans.get()
-    stripe.plans.id(PLAN_ID).get()
+# GET
+stripe.plans.get()
+stripe.plans.id(PLAN_ID).get()
 
-    # POST
-    DUMMY_PLAN = {
-        'amount': 2000,
-        'interval': 'month',
-        'name': 'Amazing Gold Plan',
-        'currency': 'usd',
-        'id': 'stripe-test-gold'
-    }
-    stripe.plans.post(**DUMMY_PLAN)
+# POST
+DUMMY_PLAN = {
+    'amount': 2000,
+    'interval': 'month',
+    'name': 'Amazing Gold Plan',
+    'currency': 'usd',
+    'id': 'stripe-test-gold'
+}
+stripe.plans.post(**DUMMY_PLAN)
 
-    # DELETE
-    stripe.plans.id(DUMMY_PLAN['id']).delete()
+# DELETE
+stripe.plans.id(DUMMY_PLAN['id']).delete()
 ```
 
 
