@@ -4,6 +4,7 @@ import os
 import unittest
 
 from tornado_stripe import Stripe
+from datetime import datetime
 
 DUMMY_PLAN = {
     'amount': 2000,
@@ -12,6 +13,16 @@ DUMMY_PLAN = {
     'currency': 'usd',
     'id': 'stripe-test-gold'
  }
+
+DUMMY_CUSTOMER = {
+    'email': 'test-delete-me@example.com',
+    'description': 'Customer for test-delete-me@example.com',
+    'card': {
+        'number': 4242424242424242,
+        'exp_month': 11,
+        'exp_year': datetime.utcnow().year + 1
+    }
+}
 
 class UrlGenerationTest(unittest.TestCase):
     def setUp(self):
@@ -73,7 +84,7 @@ class UrlGenerationTest(unittest.TestCase):
         self.stripe.reset_url()
 
 
-    def nested_resource_test(self):
+    def invoices_incoming_test(self):
         '''
         self.stripe.invoices.incoming.url
             should == https://api_key:@api.stripe.com/v1/invoices/incoming
@@ -81,6 +92,19 @@ class UrlGenerationTest(unittest.TestCase):
         expectation = '%s/invoices/incoming' % (self.stripe.api_endpoint)
 
         self.stripe.invoices.incoming
+
+        self.assertEqual(self.stripe.url, expectation)
+        self.stripe.reset_url()
+
+
+    def invoices_upcoming_lines_test(self):
+        '''
+        self.stripe.invoices.incoming.url
+            should == https://api_key:@api.stripe.com/v1/invoices/upcoming/lines
+        '''
+        expectation = '%s/invoices/upcoming/lines' % (self.stripe.api_endpoint)
+
+        self.stripe.invoices.upcoming.lines
 
         self.assertEqual(self.stripe.url, expectation)
         self.stripe.reset_url()
@@ -148,3 +172,48 @@ class PlansTest(GoodApiKeyTest):
             self.assertTrue(str(e).find('Not Found') > -1)
 
 
+class InvoicesTest(GoodApiKeyTest):
+    def setUp(self):
+        GoodApiKeyTest.setUp(self)
+
+
+    def crud_test(self):
+        # Test creating DUMMY_PLAN
+        self.stripe.plans.post(**DUMMY_PLAN)
+
+        # Test creating customer
+        customer    = self.stripe.customers.post(**DUMMY_CUSTOMER)
+        customer_id = customer['id']
+        self.assertTrue(customer is not None)
+        self.assertTrue(customer_id is not None)
+
+        # Test subscribing customer to plan
+        self.stripe.customers.id(customer_id).subscription.post(
+            plan=DUMMY_PLAN['id']
+        )
+
+        # Test retreiving upcoming invoice
+        invoice = self.stripe.invoices.upcoming.get(customer=customer_id)
+        self.assertTrue(invoice is not None)
+        self.assertTrue(invoice['lines'] is not None)
+
+        # Test retreiving upcoming invoice lines
+        invoice_line = self.stripe.invoices.upcoming.lines.get(customer=customer_id)
+        self.assertTrue(invoice_line is not None, invoice_line)
+        self.assertEqual(invoice_line['object'], 'list', invoice_line)
+        self.assertEqual(invoice_line['data'][0]['object'], 'line_item', invoice_line)
+        self.assertEqual(invoice_line['data'][0]['plan']['id'], DUMMY_PLAN['id'], invoice_line)
+
+        # Test deletion of customer
+        self.stripe.customers.id(customer_id).delete()
+
+        # After deletion, such customer should not exists.
+        try:
+            customer = self.stripe.customers.id(customer_id).get()
+        except Exception, e:
+            self.assertEqual(e.__class__.__name__, 'HTTPError')
+            self.assertTrue(str(e).find('404') > -1)
+            self.assertTrue(str(e).find('Not Found') > -1)
+
+        # Delete DUMMY_PLAN
+        self.stripe.plans.id(DUMMY_PLAN['id']).delete()

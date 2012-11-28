@@ -35,7 +35,9 @@ class Stripe(object):
         'plans',
         'coupons',
         'subscription',
-        'incoming'
+        'incoming',
+        'upcoming',
+        'lines'
     ])
 
     def __init__(self, api_key, blocking=False):
@@ -126,7 +128,10 @@ class Stripe(object):
 
         httpclient_kwargs = { 'method': http_method }
 
-        if http_method != 'GET' and kwargs:
+        if http_method == 'GET' and kwargs:
+            httpclient_args = [copy_of_url + '?' + urllib.urlencode(self._nested_dict_to_url(kwargs))]
+
+        elif http_method != 'GET' and kwargs:
             httpclient_kwargs['body'] = urllib.urlencode(self._nested_dict_to_url(kwargs))
 
         return self.httpclient_instance.fetch(*httpclient_args, **httpclient_kwargs)
