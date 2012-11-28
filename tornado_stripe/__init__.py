@@ -17,7 +17,6 @@
 __all__ = ['Stripe']
 
 import urllib
-import functools
 
 from tornado import httpclient, escape
 
@@ -118,14 +117,7 @@ class Stripe(object):
         # reset self.url
         self.reset_url()
 
-        httpclient_args = [copy_of_url]
-
-        if not self.blocking:
-            if not callback:
-                callback = lambda x: x
-
-            httpclient_args.append(functools.partial(self._parse_response, callback))
-
+        httpclient_args   = [copy_of_url]
         httpclient_kwargs = { 'method': http_method }
 
         if http_method == 'GET' and kwargs:
