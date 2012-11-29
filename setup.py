@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name = "tornado-stripe",
-    version = "1.0.1",
+    version = "1.0.2",
     author = "Didip Kerabat",
     author_email = "didipk@gmail.com",
     description = ("Tornado client library for accessing Stripe API"),

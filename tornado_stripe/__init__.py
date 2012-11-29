@@ -126,6 +126,9 @@ class Stripe(object):
         elif http_method != 'GET' and kwargs:
             httpclient_kwargs['body'] = urllib.urlencode(self._nested_dict_to_url(kwargs))
 
+        if not self.blocking:
+            httpclient_args.append(callback)
+
         return self.httpclient_instance.fetch(*httpclient_args, **httpclient_kwargs)
 
 
