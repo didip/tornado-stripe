@@ -17,6 +17,7 @@
 __all__ = ['Stripe']
 
 import urllib
+import functools
 
 from tornado import httpclient, escape
 
@@ -127,7 +128,7 @@ class Stripe(object):
             httpclient_kwargs['body'] = urllib.urlencode(self._nested_dict_to_url(kwargs))
 
         if not self.blocking:
-            httpclient_args.append(callback)
+            httpclient_args.append(functools.partial(self._parse_response, callback))
 
         return self.httpclient_instance.fetch(*httpclient_args, **httpclient_kwargs)
 
