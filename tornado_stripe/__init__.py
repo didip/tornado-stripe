@@ -121,10 +121,10 @@ class Stripe(object):
         httpclient_args   = [copy_of_url]
         httpclient_kwargs = { 'method': http_method }
 
-        if http_method == 'GET' and kwargs:
+        if http_method in ['GET', 'DELETE'] and kwargs:
             httpclient_args = [copy_of_url + '?' + urllib.urlencode(self._nested_dict_to_url(kwargs))]
 
-        elif http_method != 'GET' and kwargs:
+        elif kwargs:
             httpclient_kwargs['body'] = urllib.urlencode(self._nested_dict_to_url(kwargs))
 
         if not self.blocking:
