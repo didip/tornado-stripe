@@ -24,6 +24,12 @@ DUMMY_CUSTOMER = {
     }
 }
 
+DUMMY_RECIPIENTS = {
+    'name': 'John Doe',
+    'type': 'individual',
+    'tax_id': 000000000
+}
+
 class UrlGenerationTest(unittest.TestCase):
     def setUp(self):
         unittest.TestCase.setUp(self)
@@ -217,3 +223,41 @@ class InvoicesTest(GoodApiKeyTest):
 
         # Delete DUMMY_PLAN
         self.stripe.plans.id(DUMMY_PLAN['id']).delete()
+
+
+class RecipientsTest(GoodApiKeyTest):
+    def setUp(self):
+        GoodApiKeyTest.setUp(self)
+
+
+    def crud_test(self):
+        account = self.stripe.account.get()
+
+        if account['transfer_enabled']:
+            recipient    = self.stripe.recipients.post(**DUMMY_RECIPIENTS)
+            recipient_id = recipient['id']
+
+            # Test creating recipient
+            self.assertTrue(recipient is not None)
+            self.assertTrue(recipient_id is not None)
+
+            # Test retreiving recipient
+            recipient_from_stripe = self.stripe.recipients.id(recipient_id).get()
+            self.assertTrue(recipient_from_stripe is not None)
+            self.assertEqual(recipient_id, recipient_from_stripe['id'])
+
+            # Test update recipient
+            recipient_from_stripe = self.stripe.recipients.id(recipient_id).put(description='swiss bank account')
+            self.assertEqual('swiss bank account', recipient_from_stripe['description'])
+
+            # Test deletion of recipient
+            self.stripe.recipients.id(recipient_id).delete()
+
+            # After deletion, such recipient should not exists.
+            try:
+                recipient = self.stripe.recipients.id(recipient_id).get()
+            except Exception, e:
+                self.assertEqual(e.__class__.__name__, 'HTTPError')
+                self.assertTrue(str(e).find('404') > -1)
+                self.assertTrue(str(e).find('Not Found') > -1)
+

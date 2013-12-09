@@ -28,16 +28,28 @@ class Stripe(object):
     resources = set([
         'charges',
         'customers',
-        'invoices',
-        'invoiceitems',
-        'tokens',
-        'events',
+        'cards',
+        'subscription',
         'plans',
         'coupons',
-        'subscription',
-        'incoming',
+        'discount',
+        'invoices',
         'upcoming',
-        'lines'
+        'lines',
+        'invoiceitems',
+        'dispute',
+        'close',
+        'transfers',
+        'cancel',
+        'recipients',
+        'application_fees',
+        'refund',
+        'account',
+        'balance',
+        'history',
+        'events',
+        'tokens',
+        'incoming',   # I cannot find this in https://stripe.com/docs/api anymore
     ])
 
     def __init__(self, api_key, blocking=False):
